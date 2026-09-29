@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Auth {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  @@map("auth")
+}
+
+model SurveyResponse {
+  id        String         @id @default(cuid())
+  name      String?
+  email     String?
+  phone     String?
+  createdAt DateTime       @default(now())
+  answers   SurveyAnswer[]
+
+  @@map("survey_responses")
+}
+
+model SurveyAnswer {
+  id             String         @id @default(cuid())
+  responseId     String
+  response       SurveyResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  questionNumber Int
+  rating         Int
+  createdAt      DateTime       @default(now())
+
+  @@unique([responseId, questionNumber])
+  @@map("survey_answers")
+}
